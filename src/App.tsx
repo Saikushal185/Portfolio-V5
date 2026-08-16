@@ -9,20 +9,29 @@ import { HelmetProvider } from "react-helmet-async";
 import { Loader2 } from "lucide-react";
 
 import Home from "./features/home/Home";
-import ProjectsPage from "./features/projects/ProjectsPage";
-import AboutPage from "./features/about/AboutPage";
-import SkillsPage from "./features/skills/SkillsPage";
-import CredentialsPage from "./features/credentials/CredentialsPage";
-import CodingPage from "./features/coding/CodingPage";
-import ContactPage from "./features/contact/ContactPage";
-import BlogPage from "./features/blog/BlogPage";
-import BlogPost from "./features/blog/BlogPost";
-import LegalPage from "./features/legal/LegalPage";
-import NotFound from "./features/NotFound";
-import { privacyDoc, termsDoc } from "./data/legal";
 
-// Admin is behind auth and never touched by most visitors — no reason to ship
-// it in the main bundle.
+/**
+ * Every route below the landing page is split out.
+ *
+ * Home stays eager: it is the entry point for almost every visit, and lazying
+ * it would only trade the bundle for a spinner on the one page that must paint
+ * fast. Everything else — including the project and blog copy, which is the
+ * heaviest data in the app — now arrives when its route does.
+ *
+ * Admin is behind auth and never touched by most visitors, so it also drags
+ * the Supabase client out of the shared path.
+ */
+const ProjectsPage = lazy(() => import("./features/projects/ProjectsPage"));
+const AboutPage = lazy(() => import("./features/about/AboutPage"));
+const SkillsPage = lazy(() => import("./features/skills/SkillsPage"));
+const CredentialsPage = lazy(() => import("./features/credentials/CredentialsPage"));
+const CodingPage = lazy(() => import("./features/coding/CodingPage"));
+const ContactPage = lazy(() => import("./features/contact/ContactPage"));
+const BlogPage = lazy(() => import("./features/blog/BlogPage"));
+const BlogPost = lazy(() => import("./features/blog/BlogPost"));
+const PrivacyPage = lazy(() => import("./features/legal/PrivacyPage"));
+const TermsPage = lazy(() => import("./features/legal/TermsPage"));
+const NotFound = lazy(() => import("./features/NotFound"));
 const AdminPage = lazy(() =>
     import("./features/admin").then((m) => ({ default: m.AdminPage })),
 );
@@ -62,8 +71,8 @@ export default function App() {
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/blog" element={<BlogPage />} />
                         <Route path="/blog/:slug" element={<BlogPost />} />
-                        <Route path="/privacy" element={<LegalPage doc={privacyDoc} />} />
-                        <Route path="/terms" element={<LegalPage doc={termsDoc} />} />
+                        <Route path="/privacy" element={<PrivacyPage />} />
+                        <Route path="/terms" element={<TermsPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>

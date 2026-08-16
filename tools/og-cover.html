@@ -1,0 +1,136 @@
+<!doctype html>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600&family=DM+Mono:wght@400;500&display=block"
+    rel="stylesheet"
+/>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html,
+    body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+    }
+    body {
+        position: relative;
+        background: linear-gradient(160deg, #1b2534 0%, #0e1520 100%);
+        color: #dde6f0;
+        font-family: "Bricolage Grotesque", system-ui, sans-serif;
+        padding: 78px 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    /* The same arc the favicon draws, blown up and bled off the right edge. */
+    .arc {
+        position: absolute;
+        right: -160px;
+        top: -190px;
+        width: 820px;
+        height: 820px;
+        pointer-events: none;
+    }
+    .glow {
+        position: absolute;
+        right: -60px;
+        top: 40px;
+        width: 620px;
+        height: 620px;
+        border-radius: 50%;
+        background: radial-gradient(
+            circle,
+            rgba(246, 162, 30, 0.22) 0%,
+            rgba(246, 162, 30, 0.07) 45%,
+            transparent 70%
+        );
+    }
+    .top {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .eyebrow {
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 20px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #f0a85c;
+    }
+    h1 {
+        position: relative;
+        font-size: 92px;
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+        font-weight: 700;
+        color: #f4f8fd;
+        max-width: 15ch;
+    }
+    .rule {
+        width: 96px;
+        height: 3px;
+        background: #f6a21e;
+        border-radius: 2px;
+        margin: 30px 0 26px;
+    }
+    p {
+        position: relative;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 30px;
+        line-height: 1.4;
+        color: #a8b6c9;
+        max-width: 26ch;
+    }
+    .foot {
+        position: relative;
+        display: flex;
+        align-items: baseline;
+        gap: 22px;
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 21px;
+        letter-spacing: 0.06em;
+        color: #748499;
+    }
+    .foot b {
+        color: #dde6f0;
+        font-weight: 500;
+    }
+</style>
+
+<div class="glow"></div>
+<svg class="arc" viewBox="0 0 32 32" fill="none">
+    <defs>
+        <linearGradient id="a" x1="0.1" y1="1" x2="0.85" y2="0.1">
+            <stop offset="0" stop-color="#F0A85C" stop-opacity="0.12" />
+            <stop offset="0.45" stop-color="#F6A21E" stop-opacity="0.5" />
+            <stop offset="1" stop-color="#FFD08A" stop-opacity="0.9" />
+        </linearGradient>
+        <radialGradient id="o" cx="0.36" cy="0.3" r="0.8">
+            <stop offset="0" stop-color="#FFE9B8" />
+            <stop offset="0.42" stop-color="#F6A21E" />
+            <stop offset="1" stop-color="#C2551A" />
+        </radialGradient>
+    </defs>
+    <path d="M5 24 Q12.48 9.04 19.96 14.43" stroke="url(#a)" stroke-width="1.5" stroke-linecap="round" />
+    <circle cx="19.9" cy="14.4" r="4.4" fill="url(#o)" />
+</svg>
+
+<div class="top"><span class="eyebrow">Andhra Pradesh, IN</span></div>
+
+<div>
+    <h1>The number is the point.</h1>
+    <div class="rule"></div>
+    <p>Messy, real-world data turned into an answer someone can act on.</p>
+</div>
+
+<div class="foot">
+    <b>Sai Kushal Vittanala</b>
+    <span>Data Scientist &amp; ML Engineer</span>
+</div>

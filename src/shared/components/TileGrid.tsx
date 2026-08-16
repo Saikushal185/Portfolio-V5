@@ -72,6 +72,7 @@ export default function TileGrid({
                 src={item.image}
                 alt=""
                 loading="lazy"
+                decoding="async"
                 className={`${big ? "h-11 w-11" : "h-7 w-7"} shrink-0 rounded object-contain`}
             />
         ) : (

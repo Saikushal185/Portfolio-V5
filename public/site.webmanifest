@@ -1,0 +1,13 @@
+{
+    "name": "Sai Kushal — Data Scientist & ML Engineer",
+    "short_name": "Sai Kushal",
+    "description": "Data scientist and ML engineer. Twenty projects turning real datasets into decisions.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#131A24",
+    "theme_color": "#131A24",
+    "icons": [
+        { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+        { "src": "/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" }
+    ]
+}

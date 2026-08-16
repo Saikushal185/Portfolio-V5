@@ -10,12 +10,90 @@
             name="description"
             content="Data scientist and ML engineer. Twenty projects turning real datasets into decisions — A/B tests, credit risk, customer segmentation, readmission prediction."
         />
+        <link rel="canonical" href="https://saikushal.live/" />
+        <meta name="author" content="Sai Kushal Vittanala" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
 
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+
+        <!-- Linked here rather than @imported from index.css so the font CSS is
+             discovered in the initial HTML and fetched in parallel with the
+             bundle instead of after it. -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=DM+Mono:wght@300;400;500&display=swap"
+        />
+
+        <!-- Social cards. Without these a shared link renders as a bare URL. -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Sai Kushal" />
+        <meta property="og:url" content="https://saikushal.live/" />
+        <meta property="og:title" content="Sai Kushal — Data Scientist & ML Engineer" />
+        <meta
+            property="og:description"
+            content="Data scientist and ML engineer. Twenty projects turning real datasets into decisions — A/B tests, credit risk, customer segmentation, readmission prediction."
+        />
+        <meta property="og:image" content="https://saikushal.live/og-cover.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Sai Kushal — data scientist and ML engineer" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Sai Kushal — Data Scientist & ML Engineer" />
+        <meta
+            name="twitter:description"
+            content="Data scientist and ML engineer. Twenty projects turning real datasets into decisions."
+        />
+        <meta name="twitter:image" content="https://saikushal.live/og-cover.png" />
+
+        <!-- Person + WebSite schema. This is what search engines read to
+             associate the name with the profiles and the site's search box. -->
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@graph": [
+                    {
+                        "@type": "Person",
+                        "@id": "https://saikushal.live/#person",
+                        "name": "Sai Kushal Vittanala",
+                        "alternateName": "Sai Kushal",
+                        "url": "https://saikushal.live/",
+                        "image": "https://saikushal.live/apple-touch-icon.png",
+                        "jobTitle": "Data Scientist & ML Engineer",
+                        "description": "Data scientist and ML engineer building models and analytics that turn real datasets into decisions.",
+                        "knowsAbout": [
+                            "Data Science",
+                            "Machine Learning",
+                            "Statistics",
+                            "A/B Testing",
+                            "Credit Risk Modelling",
+                            "Customer Segmentation",
+                            "Python",
+                            "SQL"
+                        ],
+                        "sameAs": [
+                            "https://github.com/Saikushal185",
+                            "https://www.linkedin.com/in/sai-kushal-vittanala/",
+                            "https://leetcode.com/u/saikushal18/",
+                            "https://www.codechef.com/users/Saikushal185",
+                            "https://codeforces.com/profile/Saikushal185"
+                        ]
+                    },
+                    {
+                        "@type": "WebSite",
+                        "@id": "https://saikushal.live/#website",
+                        "url": "https://saikushal.live/",
+                        "name": "Sai Kushal",
+                        "publisher": { "@id": "https://saikushal.live/#person" },
+                        "inLanguage": "en"
+                    }
+                ]
+            }
+        </script>
 
         <script>
             // Set the theme before first paint. Without this the page flashes

@@ -1,4 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=DM+Mono:wght@300;400;500&display=swap");
+/* Fonts are linked from index.html, not @imported here. An @import inside the
+   bundled stylesheet serialises the requests — the browser has to download and
+   parse this file before it even learns the font CSS exists, which costs two
+   round trips before any text can paint. That is expensive on a phone. */
 
 @tailwind base;
 @tailwind components;
@@ -256,13 +259,22 @@
 
 .doodle {
     position: absolute;
-    display: block;
+    /* No `display` here on purpose. It used to say `block`, which sits after
+       Tailwind's utilities in the output and so silently beat the `hidden`
+       in `hidden sm:block` — every phone was drawing all 24 doodles instead
+       of the 8 the layout intends. Absolute positioning already blockifies
+       the box, so the declaration was redundant as well as harmful. */
     /* Anchored on its own centre so the drift reads as floating in place.
        Parallax rides here, on `translate`, because the drift keyframes own
        `transform` — they're separate properties, so the two compose instead of
-       overwriting each other. */
-    translate: -50% calc(-50% + var(--parallax, 0px));
-    will-change: transform, translate;
+       overwriting each other.
+
+       The offset is computed here rather than in JS: `--scroll-y` is written
+       once per frame on :root and `--depth` is a static per-doodle constant, so
+       a scroll costs one property write instead of 24 React re-renders.
+       `--scroll-y` is unset below sm and under reduced motion, so this falls
+       back to a plain centred anchor. */
+    translate: -50% calc(-50% + (var(--scroll-y, 0) * var(--depth, 0) * -0.06px));
 }
 
 .doodle svg {
@@ -280,6 +292,20 @@
 }
 .doodle-c {
     animation: doodle-c 23s ease-in-out infinite alternate;
+}
+
+/* Only the visible set drifts. Both layers stay mounted for the cross-fade,
+   but animating the one at opacity 0 is pure cost — it doubled the compositing
+   work for something nobody can see. The pause is dropped during the travel so
+   the set arriving is already moving when it fades up. */
+:root[data-theme="dark"] .doodle-day .doodle,
+:root[data-theme="night"] .doodle-day .doodle,
+:root:not([data-theme="dark"]):not([data-theme="night"]) .doodle-night .doodle {
+    animation-play-state: paused;
+}
+
+html.is-travelling .doodle-layer .doodle {
+    animation-play-state: running;
 }
 
 @keyframes doodle-a {

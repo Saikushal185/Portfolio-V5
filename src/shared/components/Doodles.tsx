@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
     Sun,
     Leaf,
@@ -72,35 +72,64 @@ const at = (i: number, el: ReactNode, tone: Spot["tone"]): Spot => ({
 });
 
 /**
- * Scroll offset in pixels, sampled on a frame.
+ * Publishes the scroll offset as `--scroll-y` on the root element.
  *
  * The doodles are `position: fixed`, so without this they sit dead still while
  * the page moves past them. Shifting each one by its own depth puts the sky at
  * a different distance from the text.
+ *
+ * This used to be React state, which meant every scroll frame re-rendered all
+ * 24 doodles and rewrote 24 inline styles on the main thread — the single
+ * biggest source of scroll jank on phones. Now it is one `setProperty` per
+ * frame and CSS does the per-doodle maths from `--depth`, so the component
+ * never re-renders after mount.
+ *
+ * Skipped entirely below `sm`, where two thirds of the doodles are display:none
+ * anyway and the effect isn't worth a frame of a phone's budget.
  */
-function useParallax() {
-    const [y, setY] = useState(0);
-
+function useParallaxVar() {
     useEffect(() => {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const still = window.matchMedia(
+            "(prefers-reduced-motion: reduce), (max-width: 639px)",
+        );
+        const root = document.documentElement;
 
         let frame = 0;
+        const write = () => {
+            frame = 0;
+            root.style.setProperty("--scroll-y", String(window.scrollY));
+        };
         const onScroll = () => {
             if (frame) return;
-            frame = window.requestAnimationFrame(() => {
-                frame = 0;
-                setY(window.scrollY);
-            });
+            frame = window.requestAnimationFrame(write);
         };
-        onScroll();
-        window.addEventListener("scroll", onScroll, { passive: true });
-        return () => {
+
+        const stop = () => {
             window.removeEventListener("scroll", onScroll);
-            if (frame) window.cancelAnimationFrame(frame);
+            if (frame) {
+                window.cancelAnimationFrame(frame);
+                frame = 0;
+            }
+            root.style.removeProperty("--scroll-y");
+        };
+
+        // Re-evaluated on rotation and on a reduced-motion preference change,
+        // so a phone turned landscape past 640px picks the parallax back up.
+        const sync = () => {
+            stop();
+            if (!still.matches) {
+                write();
+                window.addEventListener("scroll", onScroll, { passive: true });
+            }
+        };
+
+        sync();
+        still.addEventListener("change", sync);
+        return () => {
+            still.removeEventListener("change", sync);
+            stop();
         };
     }, []);
-
-    return y;
 }
 
 const DAY: Spot[] = [
@@ -139,15 +168,7 @@ const TONE = {
     orb: "text-[rgb(var(--c-orb))]",
 } as const;
 
-const Layer = ({
-    spots,
-    className,
-    scrollY,
-}: {
-    spots: Spot[];
-    className: string;
-    scrollY: number;
-}) => (
+const Layer = ({ spots, className }: { spots: Spot[]; className: string }) => (
     <div className={`doodle-layer ${className}`} aria-hidden="true">
         {spots.map((s, i) => (
             <span
@@ -161,10 +182,9 @@ const Layer = ({
                     width: s.size,
                     height: s.size,
                     animationDelay: s.delay,
-                    // Feeds the existing drift keyframes, which already
-                    // translate — hence a variable rather than a transform that
-                    // would overwrite them.
-                    ["--parallax" as string]: `${-scrollY * s.depth * 0.06}px`,
+                    // Static. The stylesheet multiplies this by `--scroll-y` to
+                    // get the parallax offset, so scrolling never touches React.
+                    ["--depth" as string]: s.depth,
                 }}
             >
                 {s.el}
@@ -175,15 +195,17 @@ const Layer = ({
 
 /**
  * Both sets are always mounted and cross-faded by `--sun-position`, so the
- * doodles change with the light rather than popping in after it.
+ * doodles change with the light rather than popping in after it. The set that
+ * is currently faded out has its drift paused in CSS — invisible doodles were
+ * still animating, which cost as much as the visible ones.
  */
 export default function Doodles() {
-    const scrollY = useParallax();
+    useParallaxVar();
 
     return (
         <>
-            <Layer spots={DAY} className="doodle-day" scrollY={scrollY} />
-            <Layer spots={NIGHT} className="doodle-night" scrollY={scrollY} />
+            <Layer spots={DAY} className="doodle-day" />
+            <Layer spots={NIGHT} className="doodle-night" />
         </>
     );
 }

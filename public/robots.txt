@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Behind auth — nothing for a crawler to index, and no reason to advertise it.
+Disallow: /admin
+
+Sitemap: https://saikushal.live/sitemap.xml

@@ -26,12 +26,28 @@ interface Props {
  * route sits in the same light, and so the sun-arc control affects all of it.
  */
 export default function Page({ title, description, canonical, children }: Props) {
+    const url = canonical ? `${SITE}${canonical}` : SITE;
+
     return (
         <div className="grain relative flex min-h-screen flex-col">
+            {/*
+              The social tags are repeated per page rather than left to the ones
+              in index.html: those carry the landing page's title and URL, so
+              every shared link — a post, the projects page — previewed as the
+              home page until now. Helmet replaces by name/property, so these
+              win wherever a route sets them.
+            */}
             <Helmet>
                 <title>{title}</title>
                 {description && <meta name="description" content={description} />}
-                {canonical && <link rel="canonical" href={`${SITE}${canonical}`} />}
+                {canonical && <link rel="canonical" href={url} />}
+
+                <meta property="og:title" content={title} />
+                <meta property="og:url" content={url} />
+                {description && <meta property="og:description" content={description} />}
+
+                <meta name="twitter:title" content={title} />
+                {description && <meta name="twitter:description" content={description} />}
             </Helmet>
 
             <div className="starfield" aria-hidden="true" />

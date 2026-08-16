@@ -1,4 +1,29 @@
-# tools/record-demos.mjs
+# tools/
+
+| File | What it does |
+|---|---|
+| `record-demos.mjs` | Re-records the project demo clips in the findings wall |
+| `generate-sitemap.mjs` | Writes `public/sitemap.xml`; runs automatically on `npm run build` |
+| `og-cover.html` | Source for `public/og-cover.png`, the social share card |
+
+## tools/generate-sitemap.mjs
+
+Runs as the first step of `npm run build`, so the sitemap is never stale. It reads the static route list at the top of the file and the post slugs out of `src/data/blogData.ts`. If it finds no slugs it fails the build rather than shipping a sitemap with no posts in it — add routes to `STATIC_ROUTES` when you add a page.
+
+## tools/og-cover.html
+
+The 1200×630 card that shows when a link is shared. Re-render it after changing the headline or the palette:
+
+```bash
+~/.cache/ms-playwright/chromium-1237/chrome-linux64/chrome \
+  --headless --disable-gpu --hide-scrollbars --virtual-time-budget=8000 \
+  --screenshot=public/og-cover.png --window-size=1200,630 \
+  "file://$PWD/tools/og-cover.html"
+```
+
+`--virtual-time-budget` matters: without it the shot fires before the webfonts land and the card renders in Times.
+
+## tools/record-demos.mjs
 
 Re-records the project demo clips that play on hover in the findings wall. Everything it needs is already on this machine — no downloads.
 
