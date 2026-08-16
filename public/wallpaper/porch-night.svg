@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" role="img" aria-label="">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A8C3E0" stop-opacity=".20"/>
+      <stop offset="1" stop-color="#131A24" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="600" fill="url(#sky)"/>
+  <circle cx="1372" cy="96" r="62" fill="#A8C3E0" opacity=".20"/>
+  <circle cx="1350" cy="80" r="62" fill="#131A24" opacity=".9"/>
+  <g fill="#A8C3E0" opacity=".5">
+    <circle cx="180" cy="120" r="2"/><circle cx="420" cy="76" r="1.6"/><circle cx="640" cy="150" r="2.2"/>
+    <circle cx="880" cy="92" r="1.5"/><circle cx="300" cy="220" r="1.8"/><circle cx="1020" cy="196" r="2"/>
+    <circle cx="1440" cy="110" r="1.7"/><circle cx="760" cy="250" r="1.5"/>
+  </g>
+  <path d="M0 470q210-96 420-40t400-14 380-70 400 26v228H0Z" fill="#5E8A78" opacity=".12"/>
+  <path d="M0 524q250-70 470-18t430-30 340-52 360 40v136H0Z" fill="#5E8A78" opacity=".17"/>
+  <g fill="none" stroke="#5E8A78" stroke-width="3" stroke-linecap="round" opacity=".24">
+    <path d="M132 600V486M132 512q-40-16-52-56 42 2 52 56ZM132 496q40-22 48-64-44 6-48 64Z"/>
+    <path d="M1468 600V498M1468 522q34-14 44-50-38 4-44 50ZM1468 508q-32-18-40-52 36 4 40 52Z"/>
+  </g>
+  <circle cx="1352" cy="404" r="7" fill="#F0A85C" opacity=".55"/>
+</svg>
