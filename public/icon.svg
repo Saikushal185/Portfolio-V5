@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Sai Kushal">
+    <!--
+      The sun on its arc, the mechanic the whole site runs on. The arc is the
+      path the sun has already travelled and it stops dead at the orb, so the
+      light reads as cast rather than as a line passing through a dot. Colours
+      are the V5 night tokens: navy surface, marigold orb, lamp amber.
+    -->
+    <defs>
+        <clipPath id="tileClip">
+            <rect width="32" height="32" rx="7.5" />
+        </clipPath>
+
+        <linearGradient id="tileFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1B2534" />
+            <stop offset="1" stop-color="#0E1520" />
+        </linearGradient>
+
+        <!-- Cold at the horizon, hot where it meets the sun. -->
+        <linearGradient id="arcFill" x1="0.1" y1="1" x2="0.85" y2="0.1">
+            <stop offset="0" stop-color="#F0A85C" stop-opacity="0.22" />
+            <stop offset="0.45" stop-color="#F6A21E" stop-opacity="0.7" />
+            <stop offset="1" stop-color="#FFD08A" stop-opacity="1" />
+        </linearGradient>
+
+        <radialGradient id="orbFill" cx="0.36" cy="0.3" r="0.8">
+            <stop offset="0" stop-color="#FFE9B8" />
+            <stop offset="0.42" stop-color="#F6A21E" />
+            <stop offset="1" stop-color="#C2551A" />
+        </radialGradient>
+
+        <radialGradient id="orbGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#F6A21E" stop-opacity="0.4" />
+            <stop offset="0.5" stop-color="#F6A21E" stop-opacity="0.13" />
+            <stop offset="1" stop-color="#F6A21E" stop-opacity="0" />
+        </radialGradient>
+    </defs>
+
+    <g clip-path="url(#tileClip)">
+        <rect width="32" height="32" fill="url(#tileFill)" />
+        <circle cx="19.9" cy="14.4" r="9.2" fill="url(#orbGlow)" />
+        <path d="M5 24 Q12.48 9.04 19.96 14.43" fill="none" stroke="url(#arcFill)" stroke-width="2.6" stroke-linecap="round" />
+        <circle cx="19.9" cy="14.4" r="4.4" fill="url(#orbFill)" />
+    </g>
+</svg>
