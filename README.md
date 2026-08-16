@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://saikushal.live"><img alt="Live" src="https://img.shields.io/badge/live-saikushal.live-f6a21e"></a>
+  <a href="https://portfolio-v5-theta-five.vercel.app"><img alt="Preview" src="https://img.shields.io/badge/preview-vercel-f6a21e"></a>
   <img alt="React" src="https://img.shields.io/badge/React-18-61dafb">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178c6">
   <img alt="Vite" src="https://img.shields.io/badge/Vite-5-646cff">
@@ -20,6 +20,8 @@
 </p>
 
 <p align="center"><sub>One control moves both. Everything else follows.</sub></p>
+
+<p align="center"><sub><a href="https://saikushal.live">saikushal.live</a> still serves V3 — this replaces it once the content is signed off.</sub></p>
 
 ---
 
