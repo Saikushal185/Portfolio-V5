@@ -1,0 +1,398 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=DM+Mono:wght@300;400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   The light system.
+
+   Every colour is an RGB triple so Tailwind can apply opacity to it, and so the
+   sun-arc control can move the whole page between day and night by swapping one
+   set of values. Shadow offset, blur and alpha are variables too — that is what
+   makes the light feel directional: as the sun drops, every shadow on the page
+   lengthens, softens and turns blue.
+--------------------------------------------------------------------------- */
+
+:root {
+    /* Day — an afternoon porch. Honeyed, not bleached. */
+    --c-surface: 251 235 210;
+    --c-card: 255 246 232;
+    --c-raised: 255 252 245;
+
+    --c-ink: 42 31 23;
+    --c-ink-soft: 92 74 59;
+    --c-ink-faint: 119 97 77;
+
+    --c-sun: 154 91 8; /* burnt amber — carries text and icons, 4.6:1 on paper */
+    --c-shade: 62 91 74; /* deep garden green */
+    --c-ember: 179 58 22; /* hot orange, sparing — 5.5:1 on card */
+    --c-line: 228 207 178;
+    --c-shadow: 122 84 42; /* warm brown */
+    --c-orb: 246 162 30; /* the sun on the arc */
+    --c-img-outline: 0 0 0; /* image edges: pure black by day */
+
+    /* High sun: short, tight, warm shadows. */
+    --shadow-x: 2px;
+    --shadow-y: 10px;
+    --shadow-blur: 26px;
+    --shadow-alpha: 0.15;
+
+    /* 0 = noon, 1 = past the horizon. Drives the arc and the starfield. */
+    --sun-position: 0;
+
+    --travel: 900ms;
+    --grain-opacity: 0.5;
+}
+
+/* Night — cool everywhere except one warm lamp. */
+:root[data-theme="dark"],
+:root[data-theme="night"] {
+    --c-surface: 19 26 36;
+    --c-card: 28 37 51;
+    --c-raised: 37 48 65;
+
+    --c-ink: 221 230 240;
+    --c-ink-soft: 168 182 201;
+    --c-ink-faint: 116 132 153;
+
+    --c-sun: 240 168 92; /* the lamp — the only warm thing left */
+    --c-shade: 104 150 131;
+    --c-ember: 232 122 88;
+    --c-line: 46 60 79;
+    --c-shadow: 5 9 17; /* cool near-black */
+    --c-orb: 168 195 224; /* moonlight, not lamplight */
+    --c-img-outline: 255 255 255; /* pure white after dark */
+
+    /* Low sun: long, soft, cold shadows. */
+    --shadow-x: 9px;
+    --shadow-y: 22px;
+    --shadow-blur: 52px;
+    --shadow-alpha: 0.5;
+
+    --sun-position: 1;
+    --grain-opacity: 0.22;
+}
+
+/* Respect the OS preference until the visitor makes an explicit choice. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="day"]) {
+        --c-surface: 19 26 36;
+        --c-card: 28 37 51;
+        --c-raised: 37 48 65;
+
+        --c-ink: 221 230 240;
+        --c-ink-soft: 168 182 201;
+        --c-ink-faint: 116 132 153;
+
+        --c-sun: 240 168 92;
+        --c-shade: 104 150 131;
+        --c-ember: 232 122 88;
+        --c-line: 46 60 79;
+        --c-shadow: 5 9 17;
+        --c-orb: 168 195 224;
+        --c-img-outline: 255 255 255;
+
+        --shadow-x: 9px;
+        --shadow-y: 22px;
+        --shadow-blur: 52px;
+        --shadow-alpha: 0.5;
+
+        --sun-position: 1;
+        --grain-opacity: 0.22;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-line;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-surface font-prose text-ink antialiased;
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        overflow-x: hidden;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display font-semibold text-ink;
+        text-wrap: balance;
+    }
+
+    /* Keyboard focus has to stay visible against both a honeyed paper and a
+       near-black slate, so it borrows the accent rather than a fixed colour. */
+    :focus-visible {
+        outline: 2px solid rgb(var(--c-sun));
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+
+    ::selection {
+        background: rgb(var(--c-sun) / 0.28);
+        color: rgb(var(--c-ink));
+    }
+}
+
+@layer components {
+    .shell {
+        @apply mx-auto w-full max-w-shell px-5 sm:px-8;
+    }
+
+    .eyebrow {
+        @apply font-mono text-eyebrow uppercase text-ink-faint;
+    }
+
+    /* Paper grain. Inline SVG turbulence — no image request, and it sits under
+       the content so text stays crisp. */
+    .grain::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: var(--grain-opacity);
+        transition: opacity var(--travel) ease;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+    }
+
+    /* Stars fade in only once the sun is down. */
+    .starfield {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: var(--sun-position);
+        transition: opacity var(--travel) ease;
+        /* Weighted to the right and lower thirds. Content is left-aligned, and a
+           star landing mid-headline reads as a stray diacritic. */
+        background-image:
+            radial-gradient(1.5px 1.5px at 72% 9%, rgb(var(--c-ink) / 0.5), transparent 100%),
+            radial-gradient(1px 1px at 86% 22%, rgb(var(--c-ink) / 0.38), transparent 100%),
+            radial-gradient(1.5px 1.5px at 94% 38%, rgb(var(--c-ink) / 0.45), transparent 100%),
+            radial-gradient(1px 1px at 79% 52%, rgb(var(--c-ink) / 0.32), transparent 100%),
+            radial-gradient(1.5px 1.5px at 63% 81%, rgb(var(--c-ink) / 0.4), transparent 100%),
+            radial-gradient(1px 1px at 88% 88%, rgb(var(--c-ink) / 0.34), transparent 100%),
+            radial-gradient(1px 1px at 22% 91%, rgb(var(--c-ink) / 0.28), transparent 100%),
+            radial-gradient(1.5px 1.5px at 41% 86%, rgb(var(--c-ink) / 0.34), transparent 100%),
+            radial-gradient(1px 1px at 6% 76%, rgb(var(--c-ink) / 0.26), transparent 100%),
+            radial-gradient(1px 1px at 97% 71%, rgb(var(--c-ink) / 0.3), transparent 100%);
+        background-repeat: no-repeat;
+    }
+
+    /* Sunlight through a window, falling from the top-left. Slides down and
+       fades out as the sun sets. */
+    .daylight {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: calc(1 - var(--sun-position));
+        transform: translateY(calc(var(--sun-position) * 26%));
+        transition:
+            opacity var(--travel) ease,
+            transform var(--travel) cubic-bezier(0.34, 1.12, 0.4, 1);
+        background:
+            radial-gradient(60rem 34rem at 14% -8%, rgb(var(--c-orb) / 0.34), transparent 68%),
+            radial-gradient(40rem 26rem at 88% 6%, rgb(var(--c-ember) / 0.12), transparent 70%);
+    }
+
+    .card-surface {
+        @apply rounded-card border border-line bg-card shadow-raking;
+    }
+
+    /* Story overlay entrance. Starts at 0.985, not 0 — anything smaller reads
+       as a pop rather than a panel arriving. On phones it rises from the
+       bottom edge, which is where the panel actually sits. */
+    .story-panel {
+        animation: panel-in 280ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+    }
+
+    @keyframes panel-in {
+        from {
+            opacity: 0;
+            transform: translateY(18px) scale(0.985);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+}
+
+/* ---------------------------------------------------------------------
+   Background doodles.
+
+   Two layers, both always mounted, cross-faded by --sun-position so the
+   sky's contents change with the light rather than popping in after it.
+   Faint on purpose: this is wallpaper, and the cards above it are opaque.
+--------------------------------------------------------------------- */
+.doodle-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.doodle-day {
+    opacity: calc((1 - var(--sun-position)) * 0.45);
+    transition: opacity var(--travel) ease;
+}
+
+.doodle-night {
+    opacity: calc(var(--sun-position) * 0.55);
+    transition: opacity var(--travel) ease;
+}
+
+.doodle {
+    position: absolute;
+    display: block;
+    /* Anchored on its own centre so the drift reads as floating in place.
+       Parallax rides here, on `translate`, because the drift keyframes own
+       `transform` — they're separate properties, so the two compose instead of
+       overwriting each other. */
+    translate: -50% calc(-50% + var(--parallax, 0px));
+    will-change: transform, translate;
+}
+
+.doodle svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Three paths at different periods, none of them a multiple of another, so
+   the group never visibly resynchronises. */
+.doodle-a {
+    animation: doodle-a 19s ease-in-out infinite alternate;
+}
+.doodle-b {
+    animation: doodle-b 26s ease-in-out infinite alternate;
+}
+.doodle-c {
+    animation: doodle-c 23s ease-in-out infinite alternate;
+}
+
+@keyframes doodle-a {
+    from {
+        transform: translate3d(0, 0, 0) rotate(-2deg);
+    }
+    to {
+        transform: translate3d(7px, -16px, 0) rotate(3deg);
+    }
+}
+
+@keyframes doodle-b {
+    from {
+        transform: translate3d(0, 0, 0) rotate(2deg);
+    }
+    to {
+        transform: translate3d(-10px, 12px, 0) rotate(-3deg);
+    }
+}
+
+@keyframes doodle-c {
+    from {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    to {
+        transform: translate3d(11px, 9px, 0) rotate(4deg);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Theme travel.
+
+   The long cross-fade is applied only while the sun is actually moving. Leaving
+   it on permanently would make every hover feel like it was underwater.
+--------------------------------------------------------------------------- */
+/* This used to be a universal `:where(*, *::before, *::after)` sweep, which ran
+   the travel at ~11fps — 13 frames in 1.2s, worst frame 157ms. Measured, the
+   cost was the *breadth*, not the property list: dropping box-shadow, fill and
+   stroke from it only bought 13 → 17 frames, while removing the universal
+   selector entirely jumped to 55. Roughly 6400 transitions were being created
+   across 1071 elements every toggle.
+
+   These three rules cost the same as no transition at all (43 frames vs a
+   46-frame floor) because they match tens of elements instead of a thousand.
+   `color` is inherited, so putting it on `body` carries every descendant that
+   doesn't set its own — the explicit list below is only for the ones that do. */
+html.is-travelling body {
+    transition:
+        background-color var(--travel) ease,
+        color var(--travel) ease !important;
+}
+
+html.is-travelling :where(.card-surface, header, footer, input, textarea) {
+    transition:
+        background-color var(--travel) ease,
+        border-color var(--travel) ease,
+        box-shadow var(--travel) ease !important;
+}
+
+/* Deliberately no `span` here. TextEffect renders one per character, so the
+   page carries 393 of them and including the selector cost 15 frames on its
+   own. They inherit `color` from the heading or paragraph above, which is in
+   this list, so they cross-fade anyway — for free. */
+html.is-travelling :where(h1, h2, h3, p, a, li, button, svg, .eyebrow) {
+    transition:
+        color var(--travel) ease,
+        border-color var(--travel) ease,
+        fill var(--travel) ease,
+        stroke var(--travel) ease !important;
+}
+
+/* The sweep above sets `transition` wholesale with !important, which was
+   silently clobbering the atmosphere's own transitions — the wash and the stars
+   snapped instead of fading. These selectors carry real specificity, so with
+   !important they outrank it and the orchestration survives. */
+html.is-travelling .daylight {
+    transition:
+        opacity var(--travel) ease,
+        transform var(--travel) cubic-bezier(0.34, 1.12, 0.4, 1) !important;
+}
+
+html.is-travelling .starfield,
+html.is-travelling .doodle-layer,
+html.is-travelling .grain::before {
+    transition: opacity var(--travel) ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    /* No arc travel, no fade — the theme simply swaps. */
+    html.is-travelling :where(*, *::before, *::after),
+    html.is-travelling .daylight,
+    html.is-travelling .starfield,
+    html.is-travelling .doodle-layer {
+        transition: none !important;
+    }
+
+    /* The doodles stay, they just stop drifting. */
+    .doodle-a,
+    .doodle-b,
+    .doodle-c {
+        animation: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
