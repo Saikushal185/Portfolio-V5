@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#FBEBD2" />
+
+        <title>Sai Kushal — Data Scientist & ML Engineer</title>
+        <meta
+            name="description"
+            content="Data scientist and ML engineer. Twenty projects turning real datasets into decisions — A/B tests, credit risk, customer segmentation, readmission prediction."
+        />
+
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <script>
+            // Set the theme before first paint. Without this the page flashes
+            // honeyed paper before dropping to night for dark-mode visitors.
+            (function () {
+                try {
+                    var stored = localStorage.getItem("v5-theme");
+                    var night =
+                        stored === "night" ||
+                        (!stored &&
+                            window.matchMedia("(prefers-color-scheme: dark)").matches);
+                    document.documentElement.dataset.theme = night ? "dark" : "light";
+                    if (night) {
+                        document
+                            .querySelector('meta[name="theme-color"]')
+                            .setAttribute("content", "#131A24");
+                    }
+                } catch (e) {
+                    /* private mode — fall through to the light default */
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>
