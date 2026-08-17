@@ -35,16 +35,27 @@ export default function Hero() {
             <Wallpaper name="porch" position="top" priority />
             <div className="daylight" aria-hidden="true" />
 
+            {/* `min-w-0` on both columns is load-bearing, not defensive. A grid
+                item defaults to `min-width: auto`, so it refuses to shrink below
+                its content's min-content width — and the nowrap eyebrow below
+                made that 440px. The single-column mobile track inflated to match,
+                both columns rendered 485px wide inside a 320px content box, and
+                this section's `overflow-hidden` clipped the difference instead of
+                scrolling: text cut off on the right on every phone, and the
+                findings column visibly out of line with everything above it. */}
             <div className="shell relative z-10 grid gap-16 py-20 sm:py-28 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-start lg:gap-20">
-                <div>
+                <div className="min-w-0">
                     {/* A div, not a p: TextLoop wraps itself in a div, which is
                         invalid inside a p and made React re-parent it — the two
                         roles stacked on separate lines instead of cross-fading.
-                        `nowrap` keeps them on one line; the cycling half sits
-                        last so its changing width shoves nothing. */}
-                    <div className="eyebrow mb-6 flex flex-nowrap items-center gap-x-2">
+                        The cycling half sits last so its changing width shoves
+                        nothing, and it stays on one line from `sm` up. Below that
+                        the two halves stack — 'Andhra Pradesh, IN' plus the longer
+                        role is 440px of unbreakable text, which no phone has. The
+                        middot only separates things that share a line. */}
+                    <div className="eyebrow mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap">
                         <span className="whitespace-nowrap">{profile.locationShort}</span>
-                        <span aria-hidden="true">·</span>
+                        <span aria-hidden="true" className="hidden sm:inline">·</span>
                         {motionOK ? (
                             <TextLoop interval={3.4}>
                                 {ROLES.map((r) => (
@@ -100,7 +111,7 @@ export default function Hero() {
 
                 {/* Three real findings, stated flat. This is the thesis of the whole
                     site, so it sits level with the headline rather than under it. */}
-                <div className="lg:pt-4">
+                <div className="min-w-0 lg:pt-4">
                     <p className="eyebrow mb-5">Three things the data said</p>
                     <RevealGroup preset="blur-slide" className="divide-y divide-line border-y border-line">
                         {findings.map((p) => (

@@ -308,6 +308,52 @@ html.is-travelling .doodle-layer .doodle {
     animation-play-state: running;
 }
 
+/* While a story dialog is up, everything behind the glass holds still. This is
+   what makes the dialog's `backdrop-filter` cheap: a blur only costs once if
+   its source stops changing. Listed after `.is-travelling` so it wins if the
+   sun happens to be mid-travel when the dialog opens. */
+html.dialog-open .doodle,
+html.dialog-open .doodle-layer .doodle {
+    animation-play-state: paused;
+}
+
+/* The story dialog's veil. Blur carries the separation; the tint is only a
+   hint, and it is the theme's own surface rather than black, so light mode
+   frosts toward paper instead of dimming toward night. */
+.morph-scrim {
+    /* The veil is deliberately thin. At 0.55 it was hiding the doodles — they
+       are low-opacity line art, so a wash of the page's own colour erases them
+       long before it erases body text. Blur does the concealing instead: at
+       22px the rows behind are unreadable while the art keeps its shape, which
+       is the point of having it. Legibility of the panel comes from `.morph-panel`
+       elevation, not from drowning what is underneath. */
+    background-color: rgb(var(--c-surface) / 0.25);
+    -webkit-backdrop-filter: blur(22px) saturate(120%);
+    backdrop-filter: blur(22px) saturate(120%);
+}
+
+/* No backdrop-filter (older WebKit, Firefox with the flag off) means no
+   separation at all from a 0.55 veil, so those browsers get an opaque-enough
+   scrim instead. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .morph-scrim {
+        background-color: rgb(var(--c-surface) / 0.88);
+    }
+}
+
+/* The panel has to carry its own separation now.
+   `shadow-raking` is a low, sun-following shadow tuned for cards sitting on the
+   page; over a frosted veil of nearly the same tone it vanishes, and the dialog
+   read as a shape with no edge. A dark scrim was doing that work before. This
+   is a proper elevation — a hairline ring so the boundary is always defined,
+   plus a wide soft cast so the panel sits above the frost. */
+.morph-panel {
+    box-shadow:
+        0 0 0 1px rgb(var(--c-ink) / 0.09),
+        0 18px 48px -16px rgb(var(--c-shadow) / 0.5),
+        0 2px 10px -4px rgb(var(--c-shadow) / 0.3);
+}
+
 @keyframes doodle-a {
     from {
         transform: translate3d(0, 0, 0) rotate(-2deg);

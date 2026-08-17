@@ -50,8 +50,9 @@ export const resumeResearch = {
 export const resumeEducation = {
     org: "Vellore Institute of Technology",
     period: "2022 - 2026",
-    degree: "B.Tech in Computer Science and Engineering",
-    grade: "CGPA: 8.44/10",
+    degree:
+        "B.Tech in Computer Science and Engineering (Specialization in Data Analytics)",
+    grade: "CGPA: 8.56/10",
 };
 
 export const resumeSkillGroups: { label: string; items: string[] }[] = [

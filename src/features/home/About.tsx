@@ -1,4 +1,4 @@
-import { profile } from "../../data/profile";
+import { profile, credential } from "../../data/profile";
 import { skillCategories } from "../../data/skills";
 import { Icon } from "../../shared/iconMap";
 import Section from "../../shared/components/Section";
@@ -11,6 +11,24 @@ export default function About() {
             eyebrow="About"
             title="I like the datasets that argue back."
         >
+            {/* The degree used to open the prose — "I finished a B.Tech…" — which
+                spent the strongest sentence on the page on a credential. Up here
+                it is a fact you can scan and stop thinking about, and the first
+                paragraph gets to lead with the work instead. */}
+            <dl className="mb-10 flex flex-wrap gap-2">
+                {credential.map((c) => (
+                    <div
+                        key={c.label}
+                        className="rounded-pill border border-line bg-card px-4 py-2"
+                    >
+                        <dt className="sr-only">{c.label}</dt>
+                        <dd className="font-mono text-[0.7rem] uppercase tracking-widest text-ink-soft">
+                            {c.value}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+
             <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
                 <div className="max-w-readable space-y-5 text-ink-soft">
                     {/* Floated so the prose wraps around it from the second
@@ -36,10 +54,12 @@ export default function About() {
                         />
                     )}
                     <p>
-                        I finished a B.Tech in Computer Science at VIT Amaravati in 2026,
-                        specialising in data analytics, and spent the middle of 2025 as a
-                        data analyst at Brightix cleaning 20,000+ retail sales records into
-                        something a Power BI dashboard could tell the truth with.
+                        I build the part of a data project that has to hold up after
+                        someone disagrees with it — the definition, the split, the
+                        threshold, the reason this model and not the one that scored
+                        higher. In 2025 that meant a stretch as a data analyst at
+                        Brightix, turning 20,000+ retail sales records into something a
+                        Power BI dashboard could tell the truth with.
                     </p>
                     <p>
                         Most of what I build starts the same way: a public dataset that

@@ -16,13 +16,18 @@ export default function FindingsWall({
 }: Props) {
     const [category, setCategory] = useState("All");
 
-    // The wall wants a story *and* an editorial nod. `wall: false` keeps a
-    // project's narrative in the data while moving the project itself down to
-    // the list below.
-    const withStories = useMemo(
+    // Every project carries a story now, so having one no longer earns a tile —
+    // otherwise the wall swallows the whole catalogue and stops being a curated
+    // view. Promotion follows `featured`, with `wall` as the explicit override
+    // in either direction, and a headline metric is still required: a tile whose
+    // value line is blank reads as a bug.
+    const onWall = useMemo(
         () =>
             projects.filter(
-                (p) => p.story && p.wall !== false && (!featuredOnly || p.featured),
+                (p) =>
+                    p.story?.metric &&
+                    (p.wall ?? p.featured === true) &&
+                    (!featuredOnly || p.featured),
             ),
         [featuredOnly],
     );
@@ -31,8 +36,8 @@ export default function FindingsWall({
     // both, so they have to be built from both or a category that only exists
     // below the wall could never be selected.
     const onPage = useMemo(
-        () => (featuredOnly ? withStories : projects),
-        [featuredOnly, withStories],
+        () => (featuredOnly ? onWall : projects),
+        [featuredOnly, onWall],
     );
 
     const categories = useMemo(
@@ -43,9 +48,9 @@ export default function FindingsWall({
     const shown = useMemo(
         () =>
             category === "All"
-                ? withStories
-                : withStories.filter((p) => p.category === category),
-        [withStories, category],
+                ? onWall
+                : onWall.filter((p) => p.category === category),
+        [onWall, category],
     );
 
     // The tile leads with the title and carries the metric as the small muted
@@ -66,20 +71,19 @@ export default function FindingsWall({
 
     const byTitle = useMemo(() => new Map(shown.map((p) => [p.title, p])), [shown]);
 
-    // Everything else. Real work, but without a headline number it belongs in a
-    // quiet list rather than on the wall — five weak cards read weaker than five
-    // strong ones. Filtered by the same chip as the wall above it.
-    const rest = useMemo(
-        () =>
-            featuredOnly
-                ? []
-                : projects.filter(
-                      (p) =>
-                          (!p.story || p.wall === false) &&
-                          (category === "All" || p.category === category),
-                  ),
-        [featuredOnly, category],
-    );
+    // Everything the wall didn't promote. Still a full story each — the rows
+    // open the same dialog the tiles do — just without the display-type number,
+    // because thirty strong cards read weaker than six. Complement of `onWall`
+    // by identity, so a project can never appear in both lists or neither.
+    const rest = useMemo(() => {
+        if (featuredOnly) return [];
+        const promoted = new Set(onWall.map((p) => p.title));
+        return projects.filter(
+            (p) =>
+                !promoted.has(p.title) &&
+                (category === "All" || p.category === category),
+        );
+    }, [featuredOnly, onWall, category]);
 
     // Flat, this was 22 undifferentiated rows in the order they happen to sit in
     // the data file, which buried the newest work — a full-stack platform and
@@ -135,13 +139,12 @@ export default function FindingsWall({
                 </div>
             )}
 
-            {/* A filter can select a category that only exists below the wall —
-                every AI & LLM project is still waiting on its metric. Say so,
-                rather than leaving an unexplained gap above More work. */}
+            {/* A filter can select a category with nothing promoted to the wall.
+                Say so, rather than leaving an unexplained gap above More work. */}
             {shown.length === 0 && (
                 <p className="max-w-readable text-ink-soft">
-                    Nothing on the wall under {category} yet — that work is below, waiting
-                    on a number worth stating.
+                    Nothing on the wall under {category} — that work is below, and it
+                    reads the same way.
                 </p>
             )}
 
@@ -162,8 +165,9 @@ export default function FindingsWall({
                 <div className="mt-20">
                     <p className="eyebrow mb-2">More work</p>
                     <p className="mb-8 max-w-readable text-ink-soft">
-                        No headline number yet, so it stays off the wall — but the code is
-                        here. Grouped by what it is, newest bodies of work first.
+                        Off the wall because the wall only holds a handful, not because
+                        there's less to read — every row opens the same story. Grouped by
+                        what it is, newest bodies of work first.
                     </p>
 
                     {restGroups.map(([group, items]) => (
@@ -173,29 +177,26 @@ export default function FindingsWall({
                                 <span className="ml-2 text-ink-faint">{items.length}</span>
                             </p>
                             <ul className="divide-y divide-line border-y border-line">
+                                {/* The row opens the story; the code link is a
+                                    sibling, not a child. A whole-row anchor used
+                                    to send every click to GitHub, which meant the
+                                    twenty-five quieter projects had no way to be
+                                    read at all. */}
                                 {items.map((p) => (
-                                    <li key={p.title}>
+                                    <li
+                                        key={p.title}
+                                        className="flex items-start gap-4 transition-colors duration-150 hover:bg-card/60"
+                                    >
+                                        <ProjectStory project={p} variant="row" />
                                         <a
                                             href={p.github}
                                             target="_blank"
                                             rel="noreferrer noopener"
-                                            className="group flex flex-col gap-1.5 py-5 transition-colors duration-150 hover:bg-card/60"
+                                            aria-label={`${p.title} on GitHub`}
+                                            className="mt-5 flex shrink-0 items-center gap-1 font-mono text-[0.7rem] uppercase tracking-widest text-ink-faint transition-colors duration-150 hover:text-sun"
                                         >
-                                            <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                                                <span className="font-display font-semibold text-ink">
-                                                    {p.title}
-                                                </span>
-                                                <span className="ml-auto flex items-center gap-1 font-mono text-[0.7rem] uppercase tracking-widest text-ink-faint transition-colors group-hover:text-sun">
-                                                    Code
-                                                    <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                                                </span>
-                                            </span>
-                                            <span className="max-w-readable text-sm text-ink-soft">
-                                                {p.description}
-                                            </span>
-                                            <span className="mt-0.5 font-mono text-[0.7rem] text-ink-faint">
-                                                {p.tech.slice(0, 4).join(" · ")}
-                                            </span>
+                                            Code
+                                            <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
                                         </a>
                                     </li>
                                 ))}

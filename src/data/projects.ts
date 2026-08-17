@@ -6,8 +6,16 @@ export interface ProjectStory {
     problem: string;
     investigation: string;
     result: string;
-    metric: string;
-    metricLabel: string;
+    /**
+     * Optional on purpose. Every project here has a story worth reading, but not
+     * every one produced a number worth putting in 48px type — an older CV
+     * exercise or a CRUD platform has no defensible headline figure, and
+     * inventing one to fill the slot is exactly the failure this site argues
+     * against. The dialog hides the block when it's absent; the findings wall
+     * only promotes projects that have one.
+     */
+    metric?: string;
+    metricLabel?: string;
 }
 
 export interface Project {
@@ -217,6 +225,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/airbnb-pricing-analytics",
         category: "Machine Learning",
         icon: "Building2",
+        story: {
+            hook: "The model said $42 off. Holding out whole neighbourhoods said $46.",
+            problem:
+                "A new NYC host has one question and no good answer to it: what should this listing cost per night? Across 48K real listings the price signal is buried under geography, room type and neighbourhood reputation, and the naive answer — the borough average — is wrong almost everywhere.",
+            investigation:
+                "Prices were modelled in log space with a Random Forest over location, room type and listing attributes, then mapped across all five boroughs to see the structure directly. The important step was refusing the flattering evaluation: random k-fold lets the model memorise a neighbourhood and then get graded on that same neighbourhood, so a spatial GroupKFold holding out entire neighbourhoods was run alongside it. SHAP attributed the drivers globally, and quantile models replaced the point estimate with a range.",
+            result:
+                "MAE ≈ $42 on random folds and ≈ $46 under spatial cross-validation — the second number is the honest one, and it's the one reported. Hosts get an 80% nightly-price band (empirical coverage ~80%) rather than false precision, benchmarked against the live market median. Manhattan's median runs about 2× the Bronx's, and entire homes about 2.4× private rooms.",
+            metric: "$46 MAE",
+            metricLabel: "under spatial cross-validation",
+        },
     },
     {
         title: "Global Layoffs Analytics",
@@ -268,6 +287,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/customer-churn-prediction",
         category: "Machine Learning",
         icon: "PieChart",
+        story: {
+            hook: "Month-to-month customers churn at 43%. Two-year contracts churn at 3%.",
+            problem:
+                "Acquiring a telecom customer costs far more than keeping one, so the useful output isn't a churn rate — it's a list of names to call this week. On 7,043 IBM Telco customers across 21 features, the question was which ones, and how confident the number behind each name really is.",
+            investigation:
+                "Logistic Regression, Random Forest and XGBoost were each trained with the class imbalance handled explicitly rather than ignored, scaler fit on the training split only. Raw model scores are not probabilities, so the champion was recalibrated isotonically and checked against a reliability curve — Brier improved from 0.158 to 0.136. Only then were the scores allowed to drive a decision.",
+            result:
+                "The diagnosis is blunt: month-to-month contracts churn at ~43% against ~3% for two-year, fiber customers far above DSL, electronic-check payers highest of all. Ranking customers by calibrated churn probability × customer value and targeting the top decile beats random targeting by roughly $21.7K net, with a campaign profit curve showing where to stop.",
+            metric: "43% vs 3%",
+            metricLabel: "month-to-month vs two-year churn",
+        },
     },
     {
         title: "Global Energy Analytics",
@@ -277,6 +307,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/energy-consumption-analytics",
         category: "Data Analytics",
         icon: "Layers",
+        story: {
+            hook: "Everyone says the energy transition is happening. Renewables are at 15%.",
+            problem:
+                "The energy transition is discussed almost entirely in anecdotes — a record solar month here, a coal plant closing there. What's missing is the denominator. Thirty-five years of Our World in Data across 220 countries has it, but only if the comparison is done per capita and by mix rather than by headline totals, which just rank countries by population.",
+            investigation:
+                "The analysis is built around comparison rather than a single view: world energy mix over time, a renewables choropleth to place the leaders and laggards geographically, per-capita normalisation so small high-consumption countries stop disappearing behind large ones, and a country-versus-country explorer for reading any two trajectories side by side.",
+            result:
+                "The headline the aggregate actually supports: renewables sit at 15% while fossil fuels remain at 81%. Both numbers matter — the first is real growth, the second is the scale of what's left. Delivered as an explorer so the reader can check any country's story instead of taking the global average on trust.",
+            metric: "15% vs 81%",
+            metricLabel: "renewables against fossil fuels",
+        },
     },
     {
         title: "Netflix Content Analytics",
@@ -286,6 +327,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/Netflix-Analytics",
         category: "Data Analytics",
         icon: "Tv",
+        story: {
+            hook: "A catalogue is a strategy document, if you read it as one.",
+            problem:
+                "Netflix's catalogue is one of the few places a streaming company's decisions are visible from the outside. Roughly 7,800 titles carry the record of when the library grew, which countries it grew from, what it rated, and how long it asked people to sit still — none of which is legible from the title list itself.",
+            investigation:
+                "Standard exploratory work done properly: content growth over time, genre and country breakdowns, rating distribution, and duration patterns split by film against series, because pooling them makes the duration column meaningless. Every finding was computed rather than asserted, which is what makes the next step possible.",
+            result:
+                "The report generates itself. Rather than a narrative written once and left to drift as the data changes, the storytelling layer is computed live from the catalogue — rerun it against a newer export and the prose updates with the numbers.",
+            metric: "~7,800",
+            metricLabel: "titles read as a strategy",
+        },
     },
     {
         title: "Sales Analytics Dashboard",
@@ -295,6 +347,15 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/sales-dashboard",
         category: "Data Analytics",
         icon: "BarChart3",
+        story: {
+            hook: "The commercial team didn't need another chart. They needed the same chart every Monday.",
+            problem:
+                "Retail sales reporting fails in a specific way: someone rebuilds the same revenue pull by hand each week, the definitions drift a little each time, and by the quarter-end review two teams are arguing about which number is real. The problem isn't analysis, it's that the analysis isn't a fixed asset.",
+            investigation:
+                "The work went into the reporting layer rather than the visuals — revenue trends, top products, and regional performance defined once and computed the same way every run, so a number on the dashboard and a number in the report come from the same code path rather than two people's interpretations.",
+            result:
+                "An interactive Streamlit dashboard for commercial teams to interrogate themselves, backed by a generated business report for the people who want the summary and not the sliders. Same definitions behind both.",
+        },
     },
     {
         title: "Salary Prediction App",
@@ -304,6 +365,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/salary-prediction",
         category: "Machine Learning",
         icon: "LineChart",
+        story: {
+            hook: "A salary model that answers to the number is easy. One that answers for it is the work.",
+            problem:
+                "Predicting monthly income from a career profile is a tidy regression problem right up to the moment someone asks two harder questions: how wrong could this be, and is it wrong differently for different people. On 1,470 IBM HR employees, both had to be answerable.",
+            investigation:
+                "Linear Regression, Random Forest and XGBoost were compared on RMSE, MAE and R², with two engineered features — a company-tenure ratio as a loyalty signal, and prior experience derived from career history. Then the two accountability passes: gradient-boosted quantile models to replace the point estimate with a range, and a fairness audit checking error parity by gender plus a counterfactual gender-flip test.",
+            result:
+                "Job level dominates, followed by total working years and job role; tree models beat linear regression comfortably. The app returns an 80% salary band with ~81% empirical coverage on held-out data rather than a falsely precise figure, and the gender-flip test isolates the model's own contribution to pay gap at a signed shift of roughly $2 — effectively none.",
+            metric: "~81%",
+            metricLabel: "interval coverage, held-out",
+        },
     },
     {
         title: "Stock Market Dashboard",
@@ -313,6 +385,15 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/stock-market-dashboard",
         category: "Data Analytics",
         icon: "TrendingUp",
+        story: {
+            hook: "A dashboard that only works on the day you built it isn't a dashboard.",
+            problem:
+                "Most market analyses are snapshots — a notebook run against a CSV someone downloaded once, quietly stale by the following week. The interesting constraint here was building something that stays correct without anyone touching it, which turns the problem from analysis into data plumbing.",
+            investigation:
+                "Prices are pulled live through the yfinance API rather than a checked-in file, then layered into the views that actually answer questions: price history for context, moving averages for trend, returns for comparability across differently-priced tickers, and multi-ticker overlays for relative performance.",
+            result:
+                "A dashboard that updates every trading day on its own. The point isn't the charts — it's that comparing two tickers on returns rather than price is the difference between a real comparison and a chart where the expensive stock always looks more volatile.",
+        },
     },
     {
         title: "Traffic Congestion Prediction",
@@ -322,6 +403,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/Urban_Traffic_Congestion",
         category: "Machine Learning",
         icon: "Cpu",
+        story: {
+            hook: "Congestion is predictable. That's the whole opportunity.",
+            problem:
+                "Urban traffic feels chaotic from inside a car and is anything but in aggregate — it repeats by hour, by day, by corridor. Over 50K records of it, the question was whether that repetition is strong enough to predict, and whether a prediction is any use to someone who isn't a data scientist.",
+            investigation:
+                "Random Forest and Decision Trees were trained on the record set and compared, the tree kept in the picture specifically because its splits can be read aloud — a planner can follow the logic of a decision tree in a way they cannot follow an ensemble's vote. Congestion was then rendered as Matplotlib heatmaps, which is the form the pattern is legible in.",
+            result:
+                "89% accuracy on the congestion prediction, wrapped in a TypeScript web interface so the output lands somewhere a non-technical user can reach it. An early project, and the first one built end to end rather than left in a notebook.",
+            metric: "89%",
+            metricLabel: "congestion prediction accuracy",
+        },
     },
     {
         title: "Retail Store Sales Analysis",
@@ -331,6 +423,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/PowerBi-Dashboard",
         category: "Data Analytics",
         icon: "Globe",
+        story: {
+            hook: "Top-selling and most profitable are not the same list. They rarely are.",
+            problem:
+                "A retail business asks which products are doing well and means two different things at once — volume and margin. Answer with one list and the other question stays open, usually until someone discovers the best-seller has been losing money all year. Across 25K+ transactions, the job was to keep both visible.",
+            investigation:
+                "SQL did the aggregation at the grain the business actually decides on; Python handled the cleaning and the parts SQL is clumsy at. Products were ranked by revenue and by profit margin separately, and regional performance broken out so a national average couldn't hide a region carrying or dragging it.",
+            result:
+                "A Power BI dashboard with monthly trends that lets a commercial team read the two rankings against each other rather than in sequence. Built during the analyst work that this whole portfolio grew out of — plainer than what came later, and the reason the later projects lead with a decision instead of a chart.",
+            metric: "25K+",
+            metricLabel: "transactions, revenue vs margin",
+        },
     },
     {
         title: "Face Recognition System",
@@ -340,6 +443,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/Face-Recognition-project",
         category: "Computer Vision",
         icon: "Zap",
+        story: {
+            hook: "In recognition, a confident wrong answer is worse than no answer.",
+            problem:
+                "Face recognition has two failure modes and they are not equally bad. Missing a face is an inconvenience; confidently matching the wrong person is the failure that makes the system unusable. Doing either at video rate rather than on a still image is what turns it from a demo into something that runs.",
+            investigation:
+                "Detection and recognition were separated — OpenCV locating faces in the frame, TensorFlow handling the identification — so each stage could be tuned for what it's bad at. Tightening the match criteria trades a little recall for a large drop in false matches, which is the right trade when a wrong identity is the expensive error.",
+            result:
+                "97% accuracy running in real time at 30 FPS, with incorrect matches down 70%. The number worth reading is the second one: the accuracy figure says it works, the false-match reduction says it can be trusted.",
+            metric: "−70%",
+            metricLabel: "incorrect matches, at 30 FPS",
+        },
     },
     {
         title: "Hire Job Platform",
@@ -349,6 +463,15 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/Hire_Job",
         category: "Web Development",
         icon: "Brain",
+        story: {
+            hook: "Two users who want opposite things from the same screen.",
+            problem:
+                "A hiring platform has a structural problem before it has a technical one: employers and job seekers touch the same records from opposite directions. The same posting is a thing one user owns and the other browses, and the same application is an outbox to one and an inbox to the other. Get that model wrong and every feature afterwards fights it.",
+            investigation:
+                "Built on the MERN stack with the two roles designed in from the start rather than bolted on — authentication establishing who you are, then listings and applications rendered against that role. Application state lives on the application itself rather than being inferred from whoever is looking at it.",
+            result:
+                "A working full-stack platform: sign up as either side, post or apply, and manage applications through their lifecycle. No model, no metric — this one is here because building the CRUD layer properly is what makes the data projects deployable later.",
+        },
     },
     {
         title: "Super Store Analysis",
@@ -358,12 +481,22 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/Super_Store_Analysis",
         category: "Data Analytics",
         icon: "Rocket",
+        story: {
+            hook: "The first project where the question came before the chart.",
+            problem:
+                "Retail performance data invites the wrong instinct — plot everything, then look for something interesting. That produces a lot of charts and no decisions. The exercise here was to start from what a store manager would actually change and work backwards to the cuts that inform it.",
+            investigation:
+                "Performance metrics, customer segments and sales patterns were examined together rather than as separate sections, because a segment only means something against the pattern it deviates from. Pandas for the shaping, Matplotlib and Seaborn for the reading — deliberately plain tooling, with the effort going into which comparison to make.",
+            result:
+                "Actionable business insights on where the store makes money and which customers drive it. An early piece of work, and the one where the habit that runs through everything since started: lead with the finding, then show what supports it.",
+        },
     },
 
     // ── Added from GitHub, Aug 2026 ────────────────────────────────────────
-    // Descriptions and stacks are taken from each repo's README. None carry a
-    // `story`, so they sit in the quiet "More work" list rather than claiming a
-    // headline number — the metric and the three beats are Sai's to write.
+    // Descriptions, stacks and stories are drawn from each repo's README and
+    // its reported results. They sit in the "More work" list rather than on the
+    // wall — the list opens the same story dialog, so that placement is about
+    // what the page leads with, not about which projects are worth reading.
     {
         title: "ChurnLens",
         description:
@@ -372,6 +505,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/ChurnLens",
         category: "Machine Learning",
         icon: "Users",
+        story: {
+            hook: "Most churn projects stop at ROC-AUC. That's one step short of a decision.",
+            problem:
+                "A churn model that scores well still doesn't tell a retention team who to call. Two things are missing: the probabilities are usually uncalibrated, so 0.7 doesn't mean 70%, and there's no principled cutoff — the 0.5 threshold everyone uses is an artefact, not a business decision.",
+            investigation:
+                "Calibration first, via isotonic or Platt scaling with reliability curves, so the probability means what it says. Then the threshold is derived rather than assumed: given retention-offer cost, customer lifetime value and the offer's success rate, the expected net benefit per customer is written out and the profit-maximising cutoff falls out of it. SHAP supplies global importance plus per-customer waterfalls for the top at-risk names.",
+            result:
+                "An end-to-end pipeline — schema validation, leakage checks, stratified split, three models, calibration on validation, a SQLite experiment log, champion chosen on PR-AUC — ending in a ranked who-to-target list. Every business and statistical function is unit-tested against closed-form values, and the whole thing is CPU-only and runs offline.",
+            metric: "Cost-weighted",
+            metricLabel: "threshold, not the 0.5 default",
+        },
     },
     {
         title: "ExperiMint",
@@ -381,6 +525,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/ExperiMint",
         category: "Data Analytics",
         icon: "FlaskConical",
+        story: {
+            hook: "The demo run ends in NO DECISION. That's the feature.",
+            problem:
+                "A/B testing tools mostly analyse; almost none design. So teams ship an experiment, peek at it daily, and read a p-value that stopped being valid the first time they looked. The three failure modes — underpowered from the start, invalidated by peeking, and silently broken by a mis-split — all happen before analysis, which is where the tooling isn't.",
+            investigation:
+                "Design comes first: sample size and power for proportions and means, and an MDE solver for when n is already fixed. Analysis is a battery rather than a test — two-proportion z and Welch's t with effect sizes, Holm and Benjamini-Hochberg for multiple variants, Beta-Binomial and Normal Bayesian posteriors giving P(B>A) and expected loss, CUPED for variance reduction, mixture SPRT for always-valid sequential p-values you can safely peek at, and a chi-square sample-ratio-mismatch guard. Every function is unit-tested against scipy, statsmodels or a closed form — CUPED's variance reduction is verified to equal ρ².",
+            result:
+                "On the synthetic demo (n≈4000), design says 3,841 per group for a 2pp lift at 80% power; the analysis returns p=0.23, P(B>A)=0.88, CUPED reduction 5.4%, SRM clean — and the verdict is NO DECISION. The experiment was underpowered for a 1.5pp lift, which is exactly what the design module would have warned about beforehand.",
+            metric: "NO DECISION",
+            metricLabel: "the answer a tool should give",
+        },
     },
     {
         title: "DataSentry",
@@ -390,6 +545,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/DataSentry",
         category: "Data Analytics",
         icon: "Search",
+        story: {
+            hook: "Built from scratch, because a profiler you can't audit is a profiler you can't trust.",
+            problem:
+                "Nearly every data-quality failure is discovered downstream, by a stakeholder, in a meeting. The checks that would have caught it — a column that quietly went 40% null, a category set that gained a new value, a distribution that shifted between snapshots — are cheap to run and almost never run.",
+            investigation:
+                "Three layers, none of them borrowed: streaming per-column profiling (missingness, cardinality, distribution stats, IQR and z-score outliers, semantic type inference) chunked so large files fit in 16GB; a configurable rules engine — not_null, unique, range, regex, allowed_values, and referential integrity across columns — producing a 0–100 quality score; and drift between two snapshots via PSI and KS for numeric columns, chi-square and Jensen-Shannon for categorical, each with severity tiers.",
+            result:
+                "A self-contained HTML report as the deliverable, plus a CLI and a terminal UI for browsing columns. Correctness is the point: PSI is tested against a hand-computed value, KS against ks_2samp, Jensen-Shannon against scipy's, and the streaming profiler is proven to give statistics identical to a one-shot pass regardless of chunk size.",
+            metric: "0–100",
+            metricLabel: "quality score, rules you configure",
+        },
     },
     {
         title: "ForecastForge",
@@ -399,6 +565,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/ForecastForge",
         category: "Machine Learning",
         icon: "LineChart",
+        story: {
+            hook: "Most forecasting demos fit one model to one series and eyeball the plot.",
+            problem:
+                "Three things separate a forecasting demo from a forecasting system, and demos skip all of them: evaluation that respects time, intervals that actually contain the truth as often as they claim, and forecasts that stay coherent when a business adds them up. A store-level forecast that doesn't sum to the regional one is not a forecast, it's two of them.",
+            investigation:
+                "Rolling-origin backtesting with expanding and sliding windows, split boundaries unit-tested so nothing leaks. Three models behind one interface — seasonal-naive baseline, ETS, and a global gradient-boosted model over lag, rolling and calendar features — picked per series by backtest WMAPE. Uncertainty via split-conformal intervals with finite-sample coverage rather than a model's own optimism, and hierarchical reconciliation across store → region → total by both bottom-up and MinT.",
+            result:
+                "On the synthetic panel the global LightGBM leads at 0.1110 WMAPE against ETS at 0.1175 and seasonal-naive at 0.1342 — and the baseline being that close is itself the finding. Reconciliation coherence error is 0.0 bottom-up and under 1e-9 for MinT: parents equal the sum of their children to machine precision. FastAPI service, React dashboard, fixed seed, no network.",
+            metric: "0.1110",
+            metricLabel: "WMAPE, backtested per series",
+        },
     },
     {
         title: "doc-chat-cited",
@@ -408,6 +585,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/doc-chat-cited",
         category: "AI & LLM",
         icon: "BookOpen",
+        story: {
+            hook: "A citation you can't click back to is decoration.",
+            problem:
+                "Document chat is the easiest RAG system to build and the easiest to get quietly wrong. The model produces a fluent answer, attaches something that looks like a source, and nobody checks whether the passage says what the answer claims. The hard part isn't wiring retrieval up — it's being correct, and being able to show it.",
+            investigation:
+                "The grounding is a contract, not a prompt suggestion: retrieved chunks are numbered [1..k], every claim must carry an [n] marker, and the model must refuse outright when the context is insufficient. Markers are then parsed back to their source chunk, so each citation resolves to a filename, a page number and the exact snippet. Two interchangeable backends — Claude, or a local Ollama model — with embeddings and retrieval always local, so the Ollama path runs entirely offline.",
+            result:
+                "Upload a PDF, Markdown or text file, ask a question, get an answer whose every claim traces to a page you can open. The evaluation harness scores faithfulness, answer relevance and citation precision with an LLM judge, which means the refusal behaviour is measured rather than hoped for.",
+            metric: "[n] → page",
+            metricLabel: "citations that resolve",
+        },
     },
     {
         title: "hybrid-rerank-kb",
@@ -417,6 +605,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/hybrid-rerank-kb",
         category: "AI & LLM",
         icon: "Layers",
+        story: {
+            hook: "Everyone stacks retrieval layers. Almost nobody measures whether they helped.",
+            problem:
+                "The standard advice — add BM25, add a reranker — is repeated everywhere and demonstrated almost nowhere. On financial filings the stakes are concrete: dense search alone misses exact tokens like a line-item name or a fiscal-year label, which is precisely the vocabulary those questions are made of.",
+            investigation:
+                "Three configurations built to be compared, not just to work: dense vector search alone; dense fused with BM25 lexical search via Reciprocal Rank Fusion; and that fusion passed through a cross-encoder reranker. One retrieve(query, mode) function serves all three, so the eval harness and the UI take an identical code path and a difference between them can't be an artefact of different plumbing.",
+            result:
+                "The centrepiece is the eval harness, scoring recall@k and MRR for all three configs against a labelled query-to-chunk test set and printing the comparison table. Reranking's contribution shows up mostly in MRR — it moves the single most relevant chunk toward rank 1, which is the metric that matters when only the top passages reach the model. Retrieval and metrics run fully offline; only answer generation calls out.",
+            metric: "recall@k · MRR",
+            metricLabel: "each layer measured, not assumed",
+        },
     },
     {
         title: "agentic-rag-router",
@@ -426,6 +625,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/agentic-rag-router",
         category: "AI & LLM",
         icon: "Target",
+        story: {
+            hook: "\"How many orders last month?\" is not a question a vector store can answer.",
+            problem:
+                "Single-source RAG breaks on mixed questions. Ask a vector store for a count and it retrieves passages that talk about counting; ask a database about the refund policy and it has nothing to return. The routing decision — which source can actually answer this — is the part usually left to whoever built the demo.",
+            investigation:
+                "The router is a cheap Haiku tool-calling step choosing one or more of three tools: SQL over SQLite for quantitative questions, Chroma retrieval for policy and FAQ, and a pluggable web backend for fresh external facts. The SQL tool translates natural language into a validated read-only SELECT — the guard is structural, not a prompt instruction. Doc retrieval is injection-guarded. Sonnet then synthesises the grounded answer from whatever evidence came back.",
+            result:
+                "A chat interface that shows its own reasoning: which route was chosen, which tools fired, and whether the final answer leaned on [SQL], [DOCS] or [WEB]. Using a small model to route and a larger one only to synthesise keeps the expensive call on the step that needs it.",
+            metric: "3 routes",
+            metricLabel: "SQL · docs · web, chosen per question",
+        },
     },
     {
         title: "analytics-copilot",
@@ -435,6 +645,17 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/analytics-copilot",
         category: "AI & LLM",
         icon: "BarChart3",
+        story: {
+            hook: "Ask which run had the lowest MAPE. Every digit in the answer is copied, never generated.",
+            problem:
+                "RAG over prose tolerates paraphrase. RAG over experiment outputs does not — a metric that's approximately right is wrong. Worse, the questions are full of exact tokens like recall@10 or recsys-lora-r16-v5, which semantic search is structurally bad at matching because they carry almost no distributional meaning.",
+            investigation:
+                "Metric tables, model cards and run logs are chunked with typed metadata (metric, value, run_id, date) rather than as flat text. Retrieval is hybrid — dense Chroma plus BM25 fused with RRF — so exact identifiers get matched lexically while paraphrased questions still work. The local generator answers by extracting values out of retrieved metric chunks instead of writing them, and a faithfulness judge then re-checks every reported number against the context.",
+            result:
+                "A copilot that cites the exact metric row, model card or training log behind each figure, and is evaluated on numeric accuracy as well as faithfulness against an auto-derived gold set. The default backend never calls an API and never invents a number; Claude is an opt-in upgrade, not a dependency.",
+            metric: "Extract, not generate",
+            metricLabel: "every number traced to a row",
+        },
     },
     {
         title: "corrective-rag",
@@ -444,5 +665,16 @@ export const projects: Project[] = [
         github: "https://github.com/Saikushal185/corrective-rag",
         category: "AI & LLM",
         icon: "Sigma",
+        story: {
+            hook: "Naive RAG's worst answer is to a question the corpus can't answer at all.",
+            problem:
+                "Top-k retrieval always returns k chunks. When the knowledge base genuinely has nothing, it returns the k least-irrelevant ones and the model dutifully writes a confident answer out of them. The pipeline has no way to know it failed, and neither does the reader.",
+            investigation:
+                "Retrieval is treated as fallible. Each retrieved chunk is graded for relevance, and the count decides the path: all relevant means answer from the docs, some means blend in a web fallback, none means fall back entirely or refuse. After synthesis a second check asks whether the answer is faithful to the evidence, and one refinement pass with wider evidence runs if it isn't. Every step writes to a human-readable trace, so the routing decision is inspectable rather than implied.",
+            result:
+                "The A/B eval runs both pipelines over in-corpus and out-of-corpus questions. On in-corpus both answer correctly — the difference appears out of corpus, where naive RAG fabricates from irrelevant chunks and the corrective loop detects the gap and falls back or refuses. Runs fully offline by default with local embeddings and heuristic grading; USE_CLAUDE=1 upgrades the grader, generator and judge.",
+            metric: "Detect & refuse",
+            metricLabel: "where naive RAG fabricates",
+        },
     },
 ];

@@ -1,6 +1,6 @@
 import { Github, ArrowUpRight } from "lucide-react";
 import type { Project } from "../../data/projects";
-import { FadeIn, RevealText } from "../../shared/motion/Reveal";
+import { FadeIn } from "../../shared/motion/Reveal";
 import ScrollArea from "../../shared/components/ScrollArea";
 import {
     MorphingDialog,
@@ -22,47 +22,84 @@ const BEATS = [
 /**
  * The hook, and the way into the full story.
  *
- * This sits inside an expanded tile, so it opens the dialog rather than being
- * the card itself. The previous version put raw markup on both sides of the
- * dialog, which meant nothing actually morphed except the container —
- * `MorphingDialogTitle`, `Subtitle` and `Image` each carry a `layoutId`, and it
- * is having the *same* component on both sides that makes the content travel.
- * Each may appear only once per side or the ids collide.
+ * Two triggers, one dialog. `variant="tile"` sits inside an expanded tile on the
+ * findings wall and shows the hook above a "Read the full story" pill;
+ * `variant="row"` turns an entire "More work" row into the trigger, so the
+ * quieter projects open exactly the same reading experience as the headline six.
+ *
+ * The previous version put raw markup on both sides of the dialog, which meant
+ * nothing actually morphed except the container — `MorphingDialogTitle`,
+ * `Subtitle` and `Image` each carry a `layoutId`, and it is having the *same*
+ * component on both sides that makes the content travel. Each may appear only
+ * once per side or the ids collide. The row variant pairs only the title, since
+ * a list row carries no poster.
  */
-export default function ProjectStory({ project }: { project: Project }) {
-    const { story, title, category, tech, demo, github } = project;
+export default function ProjectStory({
+    project,
+    variant = "tile",
+}: {
+    project: Project;
+    /** Where the trigger lives — an expanded wall tile, or a "More work" row. */
+    variant?: "tile" | "row";
+}) {
+    const { story, title, description, category, tech, demo, github } = project;
     if (!story) return null;
 
     const poster = demo ? `/video/${demo}-poster.webp` : null;
 
     return (
         <MorphingDialog transition={{ type: "spring", stiffness: 200, damping: 24 }}>
-            <div className="mt-5">
-                <p className="max-w-readable font-prose text-lg italic leading-snug text-ink">
-                    {story.hook}
-                </p>
-
-                <MorphingDialogTrigger className="mt-6 rounded-pill border border-line bg-card px-5 py-2.5 shadow-raking transition-[border-color,box-shadow] duration-150 hover:border-sun/60 hover:shadow-lifted">
-                    <span className="flex items-center gap-2.5">
-                        {/* Both of these also appear in the dialog — that pairing
-                            is what makes them travel between the two. */}
-                        {poster && (
-                            <MorphingDialogImage
-                                src={poster}
-                                alt=""
-                                className="h-6 w-9 rounded object-cover"
-                            />
-                        )}
-                        <MorphingDialogTitle className="font-mono text-xs uppercase tracking-widest text-ink">
-                            Read the full story
+            {variant === "row" ? (
+                // The row is a button and the "Code" link is its sibling in the
+                // list item — an <a> nested inside a <button> is invalid markup
+                // and swallows keyboard activation on both.
+                <MorphingDialogTrigger
+                    className="w-full py-5 text-left"
+                    ariaLabel={`${title} — read the full story`}
+                >
+                    <span className="flex flex-col gap-1.5">
+                        <MorphingDialogTitle className="font-display font-semibold text-ink">
+                            {title}
                         </MorphingDialogTitle>
-                        <ArrowUpRight className="h-3.5 w-3.5 text-ink-faint" aria-hidden="true" />
+                        <span className="max-w-readable text-sm text-ink-soft">
+                            {description}
+                        </span>
+                        <span className="mt-0.5 flex flex-wrap items-center gap-x-3 font-mono text-[0.7rem] text-ink-faint">
+                            <span>{tech.slice(0, 4).join(" · ")}</span>
+                            {story.metric && (
+                                <span className="text-shade">{story.metric}</span>
+                            )}
+                        </span>
                     </span>
                 </MorphingDialogTrigger>
-            </div>
+            ) : (
+                <div className="mt-5">
+                    <p className="max-w-readable font-prose text-lg italic leading-snug text-ink">
+                        {story.hook}
+                    </p>
+
+                    <MorphingDialogTrigger className="mt-6 rounded-pill border border-line bg-card px-5 py-2.5 shadow-raking transition-[border-color,box-shadow] duration-150 hover:border-sun/60 hover:shadow-lifted">
+                        <span className="flex items-center gap-2.5">
+                            {/* Both of these also appear in the dialog — that pairing
+                                is what makes them travel between the two. */}
+                            {poster && (
+                                <MorphingDialogImage
+                                    src={poster}
+                                    alt=""
+                                    className="h-6 w-9 rounded object-cover"
+                                />
+                            )}
+                            <MorphingDialogTitle className="font-mono text-xs uppercase tracking-widest text-ink">
+                                Read the full story
+                            </MorphingDialogTitle>
+                            <ArrowUpRight className="h-3.5 w-3.5 text-ink-faint" aria-hidden="true" />
+                        </span>
+                    </MorphingDialogTrigger>
+                </div>
+            )}
 
             <MorphingDialogContainer>
-                <MorphingDialogContent className="card-surface relative mx-4 w-full max-w-3xl">
+                <MorphingDialogContent className="card-surface morph-panel relative mx-4 w-full max-w-3xl">
                     <MorphingDialogClose className="absolute right-5 top-5 z-10 rounded-pill border border-line bg-surface p-2 text-ink-soft transition-colors duration-150 hover:border-sun/60 hover:text-sun" />
                     <ScrollArea maxHeight="86vh" type="scroll">
                         <div className="px-6 py-10 sm:px-10 sm:py-12">
@@ -87,23 +124,37 @@ export default function ProjectStory({ project }: { project: Project }) {
                                 {title}
                             </MorphingDialogTitle>
 
-                            <p className="mt-6 font-display text-4xl font-extrabold leading-none text-ink">
-                                {story.metric}
-                            </p>
-                            <p className="mt-2 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink-faint">
-                                {story.metricLabel}
-                            </p>
+                            {/* Not every project produced a number worth 48px of
+                                display type, and filling the slot with a weak one
+                                would be the exact thing this site argues against.
+                                Absent, the hook simply becomes the opening line. */}
+                            {story.metric && (
+                                <>
+                                    <p className="mt-6 font-display text-4xl font-extrabold leading-none text-ink">
+                                        {story.metric}
+                                    </p>
+                                    {story.metricLabel && (
+                                        <p className="mt-2 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink-faint">
+                                            {story.metricLabel}
+                                        </p>
+                                    )}
+                                </>
+                            )}
 
-                            <RevealText
-                                as="p"
-                                per="word"
-                                preset="fade"
+                            {/* Was RevealText, which fires on scroll-into-view.
+                                Inside a portalled dialog that intersection never
+                                arrived, so the hook sat at opacity 0 — invisible
+                                on every story opened from a "More work" row,
+                                while the wall tiles got away with it because
+                                their copy had already been seen in the page.
+                                The dialog opening is the reveal here, so mount
+                                is the correct trigger. */}
+                            <FadeIn
                                 delay={0.15}
-                                speedReveal={2.4}
                                 className="mt-7 border-l-2 border-sun pl-5 font-prose text-xl italic leading-snug text-ink"
                             >
                                 {story.hook}
-                            </RevealText>
+                            </FadeIn>
 
                             {demo && (
                                 <figure className="mt-9">

@@ -89,6 +89,15 @@ export type MorphingDialogTriggerProps = {
   className?: string;
   style?: React.CSSProperties;
   triggerRef?: React.RefObject<HTMLButtonElement>;
+  /**
+   * Upstream hardcoded `aria-label={`Open dialog ${uniqueId}`}`, which overrides
+   * the trigger's own text — so twenty-five project rows all announced as "Open
+   * dialog :r5:" and the story pill announced as an id instead of "Read the
+   * full story". Left undefined the attribute is omitted and the button's
+   * content becomes its accessible name, which is right in both cases; pass a
+   * string only when the visible text is not enough on its own.
+   */
+  ariaLabel?: string;
 };
 
 function MorphingDialogTrigger({
@@ -96,6 +105,7 @@ function MorphingDialogTrigger({
   className,
   style,
   triggerRef,
+  ariaLabel,
 }: MorphingDialogTriggerProps) {
   const { setIsOpen, isOpen, uniqueId } = useMorphingDialog();
 
@@ -124,7 +134,7 @@ function MorphingDialogTrigger({
       aria-haspopup='dialog'
       aria-expanded={isOpen}
       aria-controls={`motion-ui-morphing-dialog-content-${uniqueId}`}
-      aria-label={`Open dialog ${uniqueId}`}
+      aria-label={ariaLabel}
     >
       {children}
     </motion.button>
@@ -181,6 +191,12 @@ function MorphingDialogContent({
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('overflow-hidden');
+      // Freezes the doodle drift for as long as the dialog is up. The backdrop
+      // blur below is only affordable because of this: `backdrop-filter` has to
+      // re-rasterise its source whenever the source changes, and twenty-four
+      // doodles on infinite CSS animations meant it changed every single frame.
+      // Static behind the glass, it rasterises once.
+      document.documentElement.classList.add('dialog-open');
       const focusableElements = containerRef.current?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
@@ -193,8 +209,15 @@ function MorphingDialogContent({
       }
     } else {
       document.body.classList.remove('overflow-hidden');
+      document.documentElement.classList.remove('dialog-open');
       triggerRef.current?.focus();
     }
+    return () => {
+      // Unmounting while open — a route change from inside the dialog — would
+      // otherwise leave the page frozen and unscrollable.
+      document.body.classList.remove('overflow-hidden');
+      document.documentElement.classList.remove('dialog-open');
+    };
   }, [isOpen, triggerRef]);
 
   useClickOutside(containerRef, () => {
@@ -246,14 +269,26 @@ function MorphingDialogContainer({ children }: MorphingDialogContainerProps) {
               rather than this site's `data-theme`, so it never matched the
               chosen theme; and a 40% white veil over honeyed paper is invisible.
               One dark scrim reads correctly in both themes. */}
-          {/* No backdrop-filter. Blurring the full viewport meant re-rendering
-              the grain, twenty-four doodles, the starfield and the wallpaper on
-              every frame of the morph: measured 17.5fps with it, 58.3fps
-              without, worst frame 112ms against 46ms. The scrim is carried a
-              little deeper to make up the separation the blur was providing. */}
+          {/* Frosted, not dimmed. The 0.62 dark scrim this replaces was
+              standing in for a blur that had been removed on performance
+              grounds — it measured 17.5fps because the doodles animate
+              continuously, so the blur's source was never static and had to be
+              re-rasterised every frame. With `.dialog-open` freezing that drift
+              the blur rasterises once, and the veil can go back to being a hint.
+
+              The tint is the theme's own `--c-surface`, so it pushes the page
+              toward its own paper in light and its own ink in dark, instead of
+              toward black in both. That reads as glass rather than as the lights
+              going out. `backdrop-blur` is a Tailwind v3 class here, but the
+              filter is written longhand so the `-webkit-` prefix comes along for
+              older WebKit. */}
           <motion.div
             key={`backdrop-${uniqueId}`}
-            className='fixed inset-0 h-full w-full bg-[rgb(22_15_10_/_0.62)]'
+            /* z-45, explicitly between the sticky header (z-40) and the dialog
+               (z-50). Left on `auto` the header out-stacked the scrim and stayed
+               perfectly sharp above a frosted page — and kept running its own
+               backdrop-blur underneath this one. */
+            className='morph-scrim fixed inset-0 z-[45] h-full w-full'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

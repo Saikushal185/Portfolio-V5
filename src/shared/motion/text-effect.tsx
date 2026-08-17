@@ -69,11 +69,22 @@ const presetVariants: Record<
   PresetType,
   { container: Variants; item: Variants }
 > = {
+  /**
+   * `transitionEnd: { filter: 'none' }` is load-bearing, not tidiness.
+   *
+   * Landing on `blur(0px)` leaves that as an inline style forever, and any
+   * computed `filter` other than `none` keeps the element on the compositor's
+   * filter path with its own layer — even at zero radius, where it paints
+   * nothing. Per-character reveals turn one headline into ~24 of those, and an
+   * audit of the landing page found 36 spans still carrying it long after the
+   * animation had finished. `transitionEnd` runs after the tween, so the blur
+   * still animates and the layer is released the moment it stops mattering.
+   */
   blur: {
     container: defaultContainerVariants,
     item: {
       hidden: { opacity: 0, filter: 'blur(12px)' },
-      visible: { opacity: 1, filter: 'blur(0px)' },
+      visible: { opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' } },
       exit: { opacity: 0, filter: 'blur(12px)' },
     },
   },
@@ -81,7 +92,12 @@ const presetVariants: Record<
     container: defaultContainerVariants,
     item: {
       hidden: { opacity: 0, y: 20, filter: 'blur(12px)' },
-      visible: { opacity: 1, y: 0, filter: 'blur(0px)' },
+      visible: {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        transitionEnd: { filter: 'none' },
+      },
       exit: { opacity: 0, y: 20, filter: 'blur(12px)' },
     },
   },

@@ -30,6 +30,15 @@ export const profile = {
     },
 } as const;
 
+// The degree, stated as facts rather than buried in a sentence. About renders
+// these as a strip above the prose so the opening paragraph is free to lead
+// with the work. Kept in sync with data/education.ts, which is the long form.
+export const credential = [
+    { label: "Degree", value: "B.Tech CSE · Data Analytics" },
+    { label: "Institution", value: "VIT-AP, 2022 — 2026" },
+    { label: "Grade", value: "8.56 CGPA" },
+] as const;
+
 // Headline stats used on Home / About / Contact.
 export const headlineStats = [
     {

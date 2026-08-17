@@ -13,11 +13,11 @@ export interface EducationEntry {
 export const education: EducationEntry[] = [
     {
         title: "Bachelor of Technology",
-        major: "Computer Science and Engineering",
+        major: "Computer Science and Engineering (Data Analytics)",
         org: "Vellore Institute of Technology",
         date: "Jul 2022 — Jun 2026",
         place: "Andhra Pradesh, India",
-        grade: "8.44 CGPA",
+        grade: "8.56 CGPA",
         featured: true,
         icon: "Library",
         courses: [
