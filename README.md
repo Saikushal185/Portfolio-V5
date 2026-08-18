@@ -21,7 +21,7 @@
 
 <p align="center"><sub>One control moves both. Everything else follows.</sub></p>
 
-<p align="center"><sub><a href="https://saikushal.live">saikushal.live</a> still serves V3 — this replaces it once the content is signed off.</sub></p>
+<p align="center"><sub>Live at <a href="https://cozy.saikushal.live">cozy.saikushal.live</a> — <a href="https://saikushal.live">saikushal.live</a> still serves V3.</sub></p>
 
 ---
 

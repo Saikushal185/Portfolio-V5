@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SITE = "https://saikushal.live";
+const SITE = "https://cozy.saikushal.live";
 
 // Everything reachable and worth indexing. /admin is deliberately absent — it
 // is behind auth and is disallowed in robots.txt.

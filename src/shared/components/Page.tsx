@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Doodles from "./Doodles";
 
-const SITE = "https://saikushal.live";
+const SITE = "https://cozy.saikushal.live";
 
 interface Props {
     title: string;
